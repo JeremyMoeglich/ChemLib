@@ -1,6 +1,10 @@
-use chem::core::{molecule::Molecule, atom::Atom, element::Element, chem_expression::ChemExpression, molecule_data::get_molecule_data};
+use std::mem::size_of_val;
+
+use chem::core::molecule_data::MOLECULE_DATA;
 
 fn main() {
-    let expr = get_molecule_data();
-    println!("{:#?}", expr.len());
+    let data = &MOLECULE_DATA;
+    let size = size_of_val(&**data);
+    println!("Size of expr: {}", size);
+    println!("{:#?}", data.len());
 }

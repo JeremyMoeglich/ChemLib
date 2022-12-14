@@ -1,10 +1,19 @@
 use flate2::read::GzDecoder;
+use lazy_static::lazy_static;
 use serde::Deserialize;
+use std::io::Read;
 
-fn get_raw_molecule_data() -> Vec<RawMoleculeData> {
+fn decompress_data() -> String {
     let compressed: &[u8] = include_bytes!("MEiLD_dataset.jsonld.gz");
     let mut decoder = GzDecoder::new(compressed);
-    let data: Vec<RawMoleculeData> = serde_json::from_reader(&mut decoder).unwrap();
+    let mut decoded = String::new();
+    decoder.read_to_string(&mut decoded).unwrap();
+    decoded
+}
+
+fn get_raw_molecule_data() -> Vec<RawMoleculeData> {
+    let decompressed = decompress_data();
+    let data: Vec<RawMoleculeData> = serde_json::from_str(&decompressed).unwrap();
     data
 }
 
@@ -73,3 +82,7 @@ pub fn get_molecule_data() -> Vec<MoleculeData> {
 }
 
 type MoleculeData = RawMoleculeData; // TODO: Add more fields
+
+lazy_static! {
+    pub static ref MOLECULE_DATA: Vec<MoleculeData> = get_molecule_data();
+}
